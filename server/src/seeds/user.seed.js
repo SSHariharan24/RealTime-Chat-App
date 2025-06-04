@@ -1,8 +1,24 @@
-import { config } from "dotenv";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Get current directory for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables from the correct path
+dotenv.config({ path: path.join(__dirname, "../../.env") });
+
+// Debug: Check environment variables
+console.log("🔍 Environment Variables Check:");
+console.log("Current working directory:", process.cwd());
+console.log("Looking for .env at:", path.join(__dirname, "../../.env"));
+console.log("MONGO_URI exists:", !!process.env.MONGO_URI);
+console.log("MONGO_URI value:", process.env.MONGO_URI ? "✅ Loaded" : "❌ Not found");
+
 import { connectDB } from "../lib/db.js";
 import User from "../models/user.model.js";
-
-config();
+import bcrypt from "bcryptjs";
 
 const seedUsers = [
   // Female Users
@@ -102,14 +118,41 @@ const seedUsers = [
 
 const seedDatabase = async () => {
   try {
+    console.log("🌱 Starting database seeding...");
+    
+    // Connect to database
     await connectDB();
 
-    await User.insertMany(seedUsers);
-    console.log("Database seeded successfully");
+    // Check if users already exist to avoid duplicates
+    const existingUsers = await User.countDocuments();
+    if (existingUsers > 0) {
+      console.log(`⚠️  Found ${existingUsers} existing users. Clearing collection...`);
+      await User.deleteMany({});
+    }
+
+    // Hash passwords before inserting
+    console.log("🔐 Hashing passwords...");
+    const hashedUsers = await Promise.all(
+      seedUsers.map(async (user) => ({
+        ...user,
+        password: await bcrypt.hash(user.password, 12),
+      }))
+    );
+
+    // Insert users into database
+    console.log("📝 Inserting users into database...");
+    await User.insertMany(hashedUsers);
+    
+    console.log(`✅ Successfully seeded ${seedUsers.length} users to database`);
+    console.log("🎉 Database seeding completed!");
+    
+    process.exit(0);
   } catch (error) {
-    console.error("Error seeding database:", error);
+    console.error("❌ Error seeding database:", error.message);
+    console.error("Full error:", error);
+    process.exit(1);
   }
 };
 
 // Call the function
- seedDatabase();
+seedDatabase();
