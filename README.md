@@ -1,6 +1,6 @@
 Realtime Chat App:
 
-A Realtime Chat Application built with the MERN stack (MongoDB, Express.js, React.js, Node.js) and Socket.IO for instant messaging. This app allows users to register, log in, and chat with others in real-time, supporting both private and group chats.
+--> A Realtime Chat Application built with the MERN stack (MongoDB, Express.js, React.js, Node.js) and Socket.IO for instant messaging. This app allows users to register, log in, and chat with others in real-time, supporting both private and group chats.
 
 Features:
 
@@ -18,12 +18,12 @@ Features:
 
 Technologies Used:
 
-Frontend: React.js, Tailwind CSS
+--> Frontend: React.js, Tailwind CSS
 
-Backend: Node.js, Express.js
+--> Backend: Node.js, Express.js
 
-Database: MongoDB
+--> Database: MongoDB
 
-Realtime Communication: Socket.IO
+--> Realtime Communication: Socket.IO
 
-Authentication: JWT
+--> Authentication: JWT
